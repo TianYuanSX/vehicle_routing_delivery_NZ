@@ -1,0 +1,16 @@
+scenario_id: wellington-demo
+planning_date: 2026-07-23
+dispatch_cutoff: "08:00"
+default_service_minutes: 5
+capacity_unit: cartons
+distance_provider: haversine
+solver: ortools
+solver_time_limit_seconds: 5
+random_seed: 42
+average_speed_kph: 35
+objective:
+  deferred_weight: 1000000
+  flowtime_weight: 10
+  distance_weight: 1
+  age_penalty_per_day: 10000
+  priority_penalty: 5000

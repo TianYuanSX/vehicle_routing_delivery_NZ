@@ -1,0 +1,4 @@
+vehicle_id,capacity,shift_start,shift_end,depot_id,active,cost_per_km,fixed_daily_cost
+VAN-01,30,08:00,16:30,WLG-DEPOT,true,0.85,120
+VAN-02,38,08:00,17:00,WLG-DEPOT,true,0.95,140
+VAN-03,24,09:00,15:30,WLG-DEPOT,true,0.75,100
