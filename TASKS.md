@@ -34,6 +34,7 @@
 
 - [x] Add all four input modes
 - [x] Add dispatch dashboard and arbitrary-coordinate map
+- [x] Add independent light/dark themes to scenario and dispatch maps
 - [x] Add vehicle workloads and simulated tracking
 - [x] Add CSV, YAML, and JSON exports
 

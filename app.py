@@ -73,6 +73,15 @@ def apply_route_geometries(
     return deck
 
 
+def apply_map_theme(deck: pdk.Deck, theme: str) -> pdk.Deck:
+    """Resolve PyDeck's key-free Carto light/dark basemap for an existing deck."""
+    deck.map_style = pdk.Deck(
+        map_provider=deck.map_provider,
+        map_style=theme.lower(),
+    ).map_style
+    return deck
+
+
 st.set_page_config(page_title="Vehicle Routing Demo", layout="wide")
 st.title("Vehicle Routing and Dispatch Prototype")
 st.caption("Static planning and simulated tracking — not live GPS tracking.")
@@ -218,7 +227,17 @@ with st.container(border=True):
         "Input preview — depot and order markers update automatically when valid "
         "uploads, manual tables, or generation settings change."
     )
-    st.pydeck_chart(scenario_deck(depot, orders), width="stretch", height=500)
+    scenario_map_theme = st.segmented_control(
+        "Map theme",
+        ["Light", "Dark"],
+        default="Light",
+        key="scenario_map_theme",
+    )
+    st.pydeck_chart(
+        apply_map_theme(scenario_deck(depot, orders), scenario_map_theme),
+        width="stretch",
+        height=500,
+    )
 
 solver_config = SolverConfig(
     time_limit,
@@ -286,12 +305,19 @@ dispatch_tab, workload_tab, tracking_tab, fleet_tab, export_tab = st.tabs(
     ["Dispatch", "Vehicle workload", "Tracking", "Fleet analysis", "Exports"]
 )
 with dispatch_tab:
-    route_line_style = st.segmented_control(
-        "Route line style",
-        ["Straight lines", "Follow roads"],
-        default="Straight lines",
-        key="route_line_style",
-    )
+    with st.container(horizontal=True):
+        route_line_style = st.segmented_control(
+            "Route line style",
+            ["Straight lines", "Follow roads"],
+            default="Straight lines",
+            key="route_line_style",
+        )
+        dispatch_map_theme = st.segmented_control(
+            "Map theme",
+            ["Light", "Dark"],
+            default="Light",
+            key="dispatch_map_theme",
+        )
     route_geometries = None
     if route_line_style == "Follow roads":
         direction_service = st.selectbox("Direction service", ["OSRM"], key="direction_service")
@@ -319,9 +345,12 @@ with dispatch_tab:
             )
     else:
         st.caption("Straight lines are an offline approximation between the planned stops.")
-    dispatch_map = apply_route_geometries(
-        dispatch_deck(instance, solution),
-        route_geometries,
+    dispatch_map = apply_map_theme(
+        apply_route_geometries(
+            dispatch_deck(instance, solution),
+            route_geometries,
+        ),
+        dispatch_map_theme,
     )
     st.pydeck_chart(dispatch_map, width="stretch")
     st.dataframe(order_results_frame(solution), width="stretch")

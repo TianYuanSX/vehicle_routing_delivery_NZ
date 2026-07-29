@@ -41,8 +41,9 @@ Astral's GitHub releases into ignored `.tools/`, then used to install/manage Pyt
   and coordinate provenance documented beside the dataset.
 - Seeded arbitrary instance generation.
 - Streamlit built-in/upload/manual/generated inputs, solver/distance/objective
-  settings, overview, auto-fit map, optional straight/OSRM road route lines,
-  workloads, simulated statuses, fleet analysis, charts, and CSV/JSON/YAML exports.
+  settings, overview, auto-fit map, independent light/dark basemap themes, optional
+  straight/OSRM road route lines, workloads, simulated statuses, fleet analysis,
+  charts, and CSV/JSON/YAML exports.
 - Reproducible fleet-size and day-by-day backlog simulation.
 - GitHub Actions checks for lock, sync, tests, Ruff, formatting, and Mypy.
 
@@ -99,9 +100,10 @@ global optimality.
   0.005 seconds wall time.
 - Streamlit server smoke: started on localhost and shut down by the timeout.
 - Streamlit AppTest: all four input modes, all three Manual tables, reactive
-  generated/uploaded map data, stale-result invalidation, optional road-geometry
-  controls with mocked success/fallback responses, and the default Wellington solve
-  completed with zero exceptions.
+  generated/uploaded map data, independent scenario/dispatch light-dark themes,
+  stale-result invalidation, optional road-geometry controls with mocked
+  success/fallback responses, and the default Wellington solve completed with zero
+  exceptions.
 - Explicit OSRM Route smoke: passed using two synthetic public Wellington points;
   returned a 181-point road-following GeoJSON line.
 - Lock check and locked sync: passed.

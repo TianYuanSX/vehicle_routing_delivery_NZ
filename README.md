@@ -18,8 +18,8 @@ fleet sizes. The included Wellington dataset is synthetic and works fully offlin
 - Built-in Wellington data at geocoded public locations, CSV upload, editable
   manual tables, and seeded instance generation.
 - Reactive Streamlit scenario preview and dispatch map with data-derived center/zoom,
-  simulated order tracking, vehicle workloads, exports, and reproducible fleet-size
-  analysis.
+  independent light/dark basemap themes, simulated order tracking, vehicle
+  workloads, exports, and reproducible fleet-size analysis.
 - Day-by-day backlog simulation that preserves creation timestamps.
 
 ## Prototype assumptions
@@ -140,6 +140,11 @@ not recalculate assignments, ETAs, reported distance, or objective values. The
 public OSRM demonstration endpoint has no production availability guarantee;
 production use should select and operate an appropriate hosted or self-hosted
 routing service.
+
+Both the scenario preview and completed dispatch map have an independent **Map
+theme** control. **Light** uses Carto Positron and **Dark** uses Carto Dark Matter;
+both are key-free, OpenStreetMap-based basemap styles. Changing a theme affects
+visualization only.
 
 The weighted objective approximates the business hierarchy:
 

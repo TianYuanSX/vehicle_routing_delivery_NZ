@@ -183,6 +183,8 @@ The application must show:
 - One path per vehicle.
 - A dispatch-map choice between offline straight segments and optional
   road-following direction-service geometry.
+- Independent light and dark OpenStreetMap-based basemap choices on the scenario
+  preview and completed dispatch map.
 - Stop order.
 - Order status.
 - ETA and order size on hover or selection.

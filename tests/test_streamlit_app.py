@@ -24,6 +24,14 @@ def _selectbox(app: AppTest, label: str):
     return next(selectbox for selectbox in app.selectbox if selectbox.label == label)
 
 
+def _segmented_control(app: AppTest, label: str, key: str | None = None):
+    return next(
+        control
+        for control in app.segmented_control
+        if control.label == label and (key is None or control.key == key)
+    )
+
+
 class FakeDirectionResponse:
     def raise_for_status(self) -> None:
         return None
@@ -88,7 +96,7 @@ def test_default_dispatch_map_preserves_two_argument_call(monkeypatch) -> None:
     assert call_count == 1
     assert len(app.metric) == 6
 
-    app.segmented_control[0].set_value("Follow roads").run()
+    _segmented_control(app, "Route line style").set_value("Follow roads").run()
 
     assert not app.exception
     assert call_count == 2
@@ -105,14 +113,25 @@ def test_scenario_map_reacts_across_input_modes(monkeypatch) -> None:
     app = AppTest.from_file("app.py", default_timeout=20).run()
     assert not app.exception
     assert _chart_json(app).count('"status": "ORDER"') == 10
+    scenario_theme = _segmented_control(app, "Map theme", "scenario_map_theme")
+    assert scenario_theme.value == "Light"
+    assert "positron-gl-style" in _chart_json(app)
+    scenario_theme.set_value("Dark").run()
+    assert "dark-matter-gl-style" in _chart_json(app)
 
     _selectbox(app, "Solver").select("greedy_insertion")
     app.button[0].click().run()
     assert len(app.metric) == 6
-    assert app.segmented_control[0].value == "Straight lines"
+    route_line_style = _segmented_control(app, "Route line style")
+    assert route_line_style.value == "Straight lines"
+    dispatch_theme = _segmented_control(app, "Map theme", "dispatch_map_theme")
+    assert dispatch_theme.value == "Light"
+    assert "positron-gl-style" in app.get("deck_gl_json_chart")[-1].proto.json
+    dispatch_theme.set_value("Dark").run()
+    assert "dark-matter-gl-style" in app.get("deck_gl_json_chart")[-1].proto.json
     assert not any(selectbox.label == "Direction service" for selectbox in app.selectbox)
     assert direction_client.calls == 0
-    app.segmented_control[0].set_value("Follow roads").run()
+    route_line_style.set_value("Follow roads").run()
     assert not app.exception
     assert any(selectbox.label == "Direction service" for selectbox in app.selectbox)
     assert direction_client.calls > 0
@@ -126,7 +145,7 @@ def test_scenario_map_reacts_across_input_modes(monkeypatch) -> None:
     assert not app.metric
     direction_client.fail = True
     next(button for button in app.button if button.label == "Solve dispatch").click().run()
-    app.segmented_control[0].set_value("Follow roads").run()
+    _segmented_control(app, "Route line style").set_value("Follow roads").run()
     assert not app.exception
     assert any("Showing straight lines instead" in item.value for item in app.warning)
 

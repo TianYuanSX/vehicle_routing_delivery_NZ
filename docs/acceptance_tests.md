@@ -205,6 +205,13 @@ Prototype one is accepted only when all critical tests pass and no known defect 
 planned stop sequence is preserved, and an unavailable service visibly falls back
 to straight segments.
 
+### AT-UI-008 Basemap theme
+
+**Given** either the input scenario map or a completed dispatch map
+**When** the user selects Light or Dark under Map theme
+**Then** that map rerenders with the corresponding OpenStreetMap-based basemap style
+without changing input data, assignments, route geometry, ETAs, or metrics.
+
 ## 7. Fleet-size experiment tests
 
 ### AT-FLEET-001 Reproducibility
