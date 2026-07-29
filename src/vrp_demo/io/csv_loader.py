@@ -223,5 +223,21 @@ def vehicles_from_dataframe(
     return load_vehicles_csv(frame.to_csv(index=False), planning_date, depot_timezone)
 
 
+def load_dataframe_bundle(
+    orders_frame: pd.DataFrame,
+    vehicles_frame: pd.DataFrame,
+    depot_frame: pd.DataFrame,
+    planning_date: date,
+    default_service_minutes: int = 5,
+) -> tuple[tuple[Order, ...], tuple[Vehicle, ...], Depot, tuple[ValidationMessage, ...]]:
+    return load_csv_bundle(
+        orders_frame.to_csv(index=False),
+        vehicles_frame.to_csv(index=False),
+        depot_frame.to_csv(index=False),
+        planning_date,
+        default_service_minutes,
+    )
+
+
 def dataframe_records(items: Iterable[Any]) -> pd.DataFrame:
     return pd.DataFrame(items)

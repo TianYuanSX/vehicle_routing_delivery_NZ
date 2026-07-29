@@ -18,8 +18,7 @@ from vrp_demo.domain.models import ObjectiveConfig, ScenarioConfig, SolverConfig
 from vrp_demo.io.csv_loader import (
     InputValidationError,
     load_csv_bundle,
-    orders_from_dataframe,
-    vehicles_from_dataframe,
+    load_dataframe_bundle,
 )
 from vrp_demo.io.example_data import load_wellington_example
 from vrp_demo.presentation.exports import (
@@ -28,7 +27,7 @@ from vrp_demo.presentation.exports import (
     solution_json,
     vehicle_results_frame,
 )
-from vrp_demo.presentation.manual_input import orders_to_manual_frame
+from vrp_demo.presentation.manual_input import depot_to_manual_frame, orders_to_manual_frame
 from vrp_demo.presentation.map_layers import dispatch_deck
 from vrp_demo.simulation.fleet_size import run_fleet_size_analysis
 from vrp_demo.simulation.instance_generator import generate_instance_data
@@ -86,6 +85,7 @@ try:
         )
     else:
         sample_orders, sample_vehicles, depot, scenario = load_wellington_example()
+        depot_frame = depot_to_manual_frame(depot)
         order_frame = orders_to_manual_frame(sample_orders)
         vehicle_frame = pd.DataFrame(
             [
@@ -100,6 +100,24 @@ try:
                 for vehicle in sample_vehicles
             ]
         )
+        st.subheader("Depot")
+        edited_depot = st.data_editor(
+            depot_frame,
+            num_rows="fixed",
+            key="manual_depot",
+            hide_index=True,
+            column_config={
+                "depot_id": st.column_config.TextColumn("Depot ID", pinned=True),
+                "name": st.column_config.TextColumn("Name"),
+                "address": st.column_config.TextColumn("Street address"),
+                "suburban": st.column_config.TextColumn("Suburban"),
+                "city": st.column_config.TextColumn("City"),
+                "latitude": st.column_config.NumberColumn("Latitude", format="%.7f"),
+                "longitude": st.column_config.NumberColumn("Longitude", format="%.7f"),
+                "timezone": st.column_config.TextColumn("IANA timezone"),
+            },
+        )
+        st.subheader("Orders")
         edited_orders = st.data_editor(
             order_frame,
             num_rows="dynamic",
@@ -113,14 +131,20 @@ try:
                 "city": st.column_config.TextColumn("City"),
             },
         )
+        st.subheader("Vehicles")
         edited_vehicles = st.data_editor(
             vehicle_frame,
             num_rows="dynamic",
             key="manual_vehicles",
             hide_index=True,
         )
-        orders = orders_from_dataframe(edited_orders)
-        vehicles = vehicles_from_dataframe(edited_vehicles, planning_date, depot.timezone)
+        orders, vehicles, depot, _ = load_dataframe_bundle(
+            edited_orders,
+            edited_vehicles,
+            edited_depot,
+            planning_date,
+            scenario.default_service_minutes,
+        )
         scenario = replace(scenario, planning_date=planning_date, dispatch_cutoff=cutoff)
 except (InputValidationError, ValueError) as exc:
     st.error(str(exc))

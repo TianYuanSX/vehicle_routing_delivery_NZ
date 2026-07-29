@@ -1,10 +1,13 @@
 from datetime import date
+from io import StringIO
 
+import pandas as pd
 import pytest
 
 from vrp_demo.io.csv_loader import (
     InputValidationError,
     load_csv_bundle,
+    load_dataframe_bundle,
     load_orders_csv,
 )
 
@@ -28,6 +31,28 @@ STRUCTURED_ORDERS = (
 def test_valid_csv_bundle_loads() -> None:
     orders, vehicles, depot, messages = load_csv_bundle(ORDERS, VEHICLES, DEPOTS, date(2026, 7, 23))
     assert (len(orders), len(vehicles), depot.depot_id, messages) == (1, 1, "DEPOT", ())
+
+
+def test_dataframe_bundle_uses_edited_depot() -> None:
+    depot_frame = pd.read_csv(
+        StringIO(DEPOTS.replace("DEPOT,Depot,-41.28,174.78", "CUSTOM,Custom depot,-41.25,174.75"))
+    )
+    vehicle_frame = pd.read_csv(StringIO(VEHICLES.replace(",DEPOT", ",CUSTOM")))
+
+    _, vehicles, depot, _ = load_dataframe_bundle(
+        pd.read_csv(StringIO(ORDERS)),
+        vehicle_frame,
+        depot_frame,
+        date(2026, 7, 23),
+    )
+
+    assert (depot.depot_id, depot.name, depot.latitude, depot.longitude) == (
+        "CUSTOM",
+        "Custom depot",
+        -41.25,
+        174.75,
+    )
+    assert vehicles[0].depot_id == depot.depot_id
 
 
 def test_extra_columns_are_accepted_for_compatibility() -> None:

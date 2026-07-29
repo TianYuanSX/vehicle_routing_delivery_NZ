@@ -4,7 +4,25 @@ from collections.abc import Iterable
 
 import pandas as pd
 
-from vrp_demo.domain.models import Order
+from vrp_demo.domain.models import Depot, Order
+
+
+def depot_to_manual_frame(depot: Depot) -> pd.DataFrame:
+    """Convert the single prototype depot to the editable input schema."""
+    return pd.DataFrame(
+        [
+            {
+                "depot_id": depot.depot_id,
+                "name": depot.name,
+                "address": getattr(depot, "address", ""),
+                "suburban": getattr(depot, "suburban", ""),
+                "city": getattr(depot, "city", ""),
+                "latitude": depot.latitude,
+                "longitude": depot.longitude,
+                "timezone": depot.timezone,
+            }
+        ]
+    )
 
 
 def orders_to_manual_frame(orders: Iterable[Order]) -> pd.DataFrame:

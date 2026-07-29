@@ -80,7 +80,7 @@ The UI supports:
 
 1. Built-in Wellington example.
 2. Three CSV uploads.
-3. Editable order and vehicle tables.
+3. Editable single-depot, order, and vehicle tables.
 4. A deterministic generated instance with an explicit seed.
 
 Minimal order CSV:

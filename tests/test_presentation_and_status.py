@@ -11,7 +11,7 @@ from vrp_demo.presentation.exports import (
     solution_json,
     vehicle_results_frame,
 )
-from vrp_demo.presentation.manual_input import orders_to_manual_frame
+from vrp_demo.presentation.manual_input import depot_to_manual_frame, orders_to_manual_frame
 from vrp_demo.presentation.map_layers import map_view
 from vrp_demo.solvers.greedy_insertion import GreedyInsertionSolver
 
@@ -41,6 +41,16 @@ def test_manual_input_accepts_order_from_before_structured_addresses(timezone) -
     assert row["suburban"] == "Te Aro"
     assert row["address"] == ""
     assert row["city"] == ""
+
+
+def test_depot_is_converted_to_manual_input(depot) -> None:
+    row = depot_to_manual_frame(depot).iloc[0]
+
+    assert row["depot_id"] == "DEPOT"
+    assert row["name"] == "Test depot"
+    assert row["latitude"] == -41.28
+    assert row["longitude"] == 174.78
+    assert row["timezone"] == "Pacific/Auckland"
 
 
 def test_exports_reconcile_and_statuses_advance(depot, scenario) -> None:

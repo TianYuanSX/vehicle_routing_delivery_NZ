@@ -72,7 +72,8 @@ The user uploads order, vehicle, and depot CSV files. The system validates them 
 
 ### 5.3 Enter data manually
 
-The user creates or edits orders and vehicles in an editable table, then runs the selected solver.
+The user creates or edits the single depot, orders, and vehicles in editable tables,
+then runs the selected solver.
 
 ### 5.4 Generate an instance
 
