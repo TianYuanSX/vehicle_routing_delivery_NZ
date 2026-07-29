@@ -297,10 +297,16 @@ with dispatch_tab:
             )
     else:
         st.caption("Straight lines are an offline approximation between the planned stops.")
-    st.pydeck_chart(
-        dispatch_deck(instance, solution, route_geometries),
-        width="stretch",
+    dispatch_map = (
+        dispatch_deck(instance, solution)
+        if route_geometries is None
+        else dispatch_deck(
+            instance,
+            solution,
+            route_geometries=route_geometries,
+        )
     )
+    st.pydeck_chart(dispatch_map, width="stretch")
     st.dataframe(order_results_frame(solution), width="stretch")
 with workload_tab:
     st.dataframe(vehicle_results_frame(solution), width="stretch")

@@ -2,6 +2,8 @@ from pathlib import Path
 
 from streamlit.testing.v1 import AppTest
 
+from vrp_demo.presentation import map_layers
+
 
 def _chart_json(app: AppTest) -> str:
     charts = app.get("deck_gl_json_chart")
@@ -50,6 +52,27 @@ class FakeDirectionClient:
 class FakeNoRouteResponse(FakeDirectionResponse):
     def json(self):
         return {"code": "NoRoute"}
+
+
+def test_default_dispatch_map_preserves_two_argument_call(monkeypatch) -> None:
+    """A hot-reloaded app can temporarily retain the previous map module."""
+    original_dispatch_deck = map_layers.dispatch_deck
+    call_count = 0
+
+    def previous_dispatch_deck(instance, solution):
+        nonlocal call_count
+        call_count += 1
+        return original_dispatch_deck(instance, solution)
+
+    monkeypatch.setattr(map_layers, "dispatch_deck", previous_dispatch_deck)
+
+    app = AppTest.from_file("app.py", default_timeout=20).run()
+    _selectbox(app, "Solver").select("greedy_insertion")
+    next(button for button in app.button if button.label == "Solve dispatch").click().run()
+
+    assert not app.exception
+    assert call_count == 1
+    assert len(app.metric) == 6
 
 
 def test_scenario_map_reacts_across_input_modes(monkeypatch) -> None:
