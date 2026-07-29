@@ -1,5 +1,9 @@
 # Vehicle Routing Solution
 
+![Wellington vehicle-routing result with road-following routes and delivery markers](docs/assets/dispatch-result.png)
+
+*Example dispatch result for the built-in Wellington scenario.*
+
 A working first prototype of a static, single-depot capacitated vehicle-routing
 and dispatch application. It assigns feasible orders to vehicle routes, produces
 ETAs, explicitly retains deferred orders, simulates planned tracking, and compares
