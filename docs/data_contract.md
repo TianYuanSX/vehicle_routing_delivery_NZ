@@ -32,17 +32,27 @@ Default filename: `orders.csv`
 | `service_minutes` | integer | Scenario default | Time at destination |
 | `priority` | integer | 1 | Higher means more important |
 | `status` | string | `PENDING` | Initial status |
-| `address` | string | empty | Display label |
-| `customer_name` | string | empty | Display-only field |
+| `customer_name` | string | empty | Public location or customer display name |
+| `suburban` | string | empty | Suburb or local area |
+| `address` | string | empty | Number and street name |
+| `city` | string | empty | City name |
 | `notes` | string | empty | Display-only field |
 
 ### Example
 
 ```csv
-order_id,latitude,longitude,size,order_created_time,service_minutes,priority,address
-ORD-001,-41.2865,174.7762,12,2026-07-22T14:30:00+12:00,5,1,"Te Aro, Wellington"
-ORD-002,-41.3058,174.7794,8,2026-07-23T07:15:00+12:00,7,2,"Newtown, Wellington"
+order_id,customer_name,suburban,address,city,latitude,longitude,size,order_created_time,service_minutes,priority
+ORD-001,Museum of New Zealand Te Papa Tongarewa,Te Aro,55 Cable Street,Wellington,-41.2903326,174.7819275,12,2026-07-22T14:30:00+12:00,5,1
+ORD-002,PAK'nSAVE Kilbirnie,Kilbirnie,78 Rongotai Road,Wellington,-41.3183504,174.7964823,8,2026-07-23T07:15:00+12:00,7,2
 ```
+
+### Address-field migration
+
+Earlier prototype files used `address` as a suburb/display label. New files should
+put that value in `suburban`, use `address` for the number and street name, and
+put the city in `city`. For backward compatibility, when neither `suburban` nor
+the accepted alias `suburb` is present, the loader treats the legacy `address`
+value as `suburban` and leaves the structured street address empty.
 
 ## 3. Vehicles input
 
@@ -90,11 +100,13 @@ Prototype one requires exactly one depot.
 | `longitude` | float | Between -180 and 180 |
 | `timezone` | string | Valid IANA timezone |
 
+Optional display fields are `address` (number and street), `suburban`, and `city`.
+
 ### Example
 
 ```csv
-depot_id,name,latitude,longitude,timezone
-WLG-DEPOT,Wellington Depot,-41.2790,174.7800,Pacific/Auckland
+depot_id,name,address,suburban,city,latitude,longitude,timezone
+WLG-DEPOT,NZ Post Wellington Super Depot,8 Carmel Terrace,Grenada Village,Wellington,-41.2007115,174.8255637,Pacific/Auckland
 ```
 
 ## 5. Scenario configuration

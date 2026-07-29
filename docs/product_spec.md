@@ -62,6 +62,10 @@ These can be introduced after the core architecture is stable.
 
 The user selects the Wellington example, chooses a solver, runs optimization, and reviews routes, ETAs, workload, order status, and summary metrics.
 
+The example uses synthetic demand attributes at verified public-facing Wellington
+street addresses. Stored coordinates are generated from those addresses so the
+example remains reproducible and available offline.
+
 ### 5.2 Upload CSV data
 
 The user uploads order, vehicle, and depot CSV files. The system validates them and displays actionable errors before solving.

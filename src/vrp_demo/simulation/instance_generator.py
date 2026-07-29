@@ -40,7 +40,10 @@ def generate_instance_data(
             planning_time - timedelta(hours=rng.randint(*creation_hours_before_cutoff)),
             rng.randint(*service_minutes_range) * 60,
             rng.randint(*priority_range),
-            address=f"Synthetic location {index + 1}",
+            address=f"{index + 1} Generated Street",
+            customer_name=f"Synthetic customer {index + 1}",
+            suburban="Generated area",
+            city="Generated city",
         )
         for index in range(number_of_orders)
     )

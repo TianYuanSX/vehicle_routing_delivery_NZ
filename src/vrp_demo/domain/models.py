@@ -45,6 +45,8 @@ class Order:
     address: str = ""
     customer_name: str = ""
     notes: str = ""
+    suburban: str = ""
+    city: str = ""
 
     def __post_init__(self) -> None:
         _non_empty(self.order_id, "order_id")
@@ -95,6 +97,9 @@ class Depot:
     latitude: float
     longitude: float
     timezone: str
+    address: str = ""
+    suburban: str = ""
+    city: str = ""
 
     def __post_init__(self) -> None:
         _non_empty(self.depot_id, "depot_id")

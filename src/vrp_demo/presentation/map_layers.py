@@ -42,7 +42,11 @@ def dispatch_deck(instance: RoutingInstance, solution: RoutingSolution) -> pdk.D
             "status": "DEPOT",
             "color": [20, 20, 20],
             "radius": 180,
-            "details": instance.depot.name,
+            "customer_name": instance.depot.name,
+            "address": instance.depot.address,
+            "suburban": instance.depot.suburban,
+            "city": instance.depot.city,
+            "details": "Depot",
         }
     ]
     for order in instance.orders:
@@ -56,6 +60,10 @@ def dispatch_deck(instance: RoutingInstance, solution: RoutingSolution) -> pdk.D
                     [200, 30, 30] if result.status == PlanningStatus.DEFERRED else [30, 150, 80]
                 ),
                 "radius": 120,
+                "customer_name": order.customer_name,
+                "address": order.address,
+                "suburban": order.suburban,
+                "city": order.city,
                 "details": (
                     f"size={order.size}; vehicle={result.vehicle_id or '-'}; "
                     f"stop={result.stop_sequence or '-'}; "
@@ -97,5 +105,10 @@ def dispatch_deck(instance: RoutingInstance, solution: RoutingSolution) -> pdk.D
         initial_view_state=pdk.ViewState(
             latitude=latitude, longitude=longitude, zoom=zoom, pitch=0
         ),
-        tooltip={"html": "<b>{location_id}</b><br>{status}<br>{details}"},
+        tooltip={
+            "html": (
+                "<b>{customer_name}</b><br>{location_id} · {status}<br>"
+                "{address}<br>{suburban}, {city}<br>{details}"
+            )
+        },
     )

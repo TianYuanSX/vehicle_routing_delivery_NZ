@@ -75,6 +75,8 @@ def load_orders_csv(
     for number, row in enumerate(rows, start=2):
         try:
             created = datetime.fromisoformat(row["order_created_time"])
+            has_structured_address = "suburban" in row or "suburb" in row
+            legacy_suburban = row.get("address") if not has_structured_address else ""
             orders.append(
                 Order(
                     order_id=row["order_id"].strip(),
@@ -90,9 +92,13 @@ def load_orders_csv(
                     ),
                     priority=_integer(row.get("priority") or "1", "priority", number),
                     status=OrderStatus((row.get("status") or "PENDING").strip().upper()),
-                    address=(row.get("address") or "").strip(),
+                    address=((row.get("address") or "").strip() if has_structured_address else ""),
                     customer_name=(row.get("customer_name") or "").strip(),
                     notes=(row.get("notes") or "").strip(),
+                    suburban=(
+                        row.get("suburban") or row.get("suburb") or legacy_suburban or ""
+                    ).strip(),
+                    city=(row.get("city") or "").strip(),
                 )
             )
         except (ValueError, KeyError) as exc:
@@ -116,6 +122,9 @@ def load_depots_csv(source: str | Path | TextIO) -> tuple[Depot, ...]:
                     _float(row["latitude"], "latitude", number),
                     _float(row["longitude"], "longitude", number),
                     row["timezone"].strip(),
+                    (row.get("address") or "").strip(),
+                    (row.get("suburban") or row.get("suburb") or "").strip(),
+                    (row.get("city") or "").strip(),
                 )
             )
         except (ValueError, KeyError) as exc:

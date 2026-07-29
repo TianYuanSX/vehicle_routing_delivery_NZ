@@ -15,8 +15,8 @@ fleet sizes. The included Wellington dataset is synthetic and works fully offlin
   optional delivery penalties, flow-time pressure, and a configurable time limit.
 - Solver-independent routes, ETAs, order results, vehicle workloads, metrics,
   exports, simulations, and UI.
-- Built-in Wellington data, CSV upload, editable manual tables, and seeded instance
-  generation.
+- Built-in Wellington data at geocoded public locations, CSV upload, editable
+  manual tables, and seeded instance generation.
 - Streamlit dispatch map with data-derived center/zoom, simulated order tracking,
   vehicle workloads, exports, and reproducible fleet-size analysis.
 - Day-by-day backlog simulation that preserves creation timestamps.
@@ -86,8 +86,8 @@ The UI supports:
 Minimal order CSV:
 
 ```csv
-order_id,latitude,longitude,size,order_created_time,service_minutes,priority
-ORD-001,-41.2865,174.7762,12,2026-07-22T14:30:00+12:00,5,2
+order_id,customer_name,suburban,address,city,latitude,longitude,size,order_created_time,service_minutes,priority
+ORD-001,Museum of New Zealand Te Papa Tongarewa,Te Aro,55 Cable Street,Wellington,-41.2903326,174.7819275,12,2026-07-22T14:30:00+12:00,5,2
 ```
 
 Minimal vehicle CSV:
@@ -100,14 +100,19 @@ VAN-01,40,08:00,17:00,WLG-DEPOT,true
 Depot CSV:
 
 ```csv
-depot_id,name,latitude,longitude,timezone
-WLG-DEPOT,Wellington Depot,-41.2790,174.7800,Pacific/Auckland
+depot_id,name,address,suburban,city,latitude,longitude,timezone
+WLG-DEPOT,NZ Post Wellington Super Depot,8 Carmel Terrace,Grenada Village,Wellington,-41.2007115,174.8255637,Pacific/Auckland
 ```
 
 Timestamps must include an offset. Local vehicle shift times are interpreted on
 the selected planning date in the depot's IANA timezone. Additional CSV columns
 are retained for compatibility where defined and otherwise safely ignored; missing
 required columns, duplicates, and any invalid row stop the complete load.
+
+`suburban`, street `address`, and `city` are separate display fields. Legacy files
+that used `address` for the suburb continue to load when `suburban` is absent.
+The Wellington example's public address sources and geocoding method are recorded
+in [`data/wellington/README.md`](data/wellington/README.md).
 
 ## Solver and distance choices
 
@@ -159,4 +164,3 @@ rather than strict multi-pass lexicographic optimization, and multi-day simulati
 is exposed as an application API rather than its own Streamlit page. Production
 extensions include multiple depots/trips, time windows, multiple capacity
 dimensions, traffic, dynamic dispatch, route geometry, and persistent live events.
-

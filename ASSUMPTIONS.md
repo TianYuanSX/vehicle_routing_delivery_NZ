@@ -23,4 +23,6 @@ These decisions apply to prototype one and should be reviewed before production 
   daily cost for used vehicles plus route kilometres times vehicle cost per kilometre.
 - Static tracking is derived from planned timestamps and a user-controlled clock; it
   is not live GPS tracking.
-
+- Built-in Wellington coordinates are one-time OpenStreetMap Nominatim geocodes of
+  public street addresses. They are demonstration map points, not verified loading
+  entrances, and the stored coordinates keep normal runs offline.

@@ -17,6 +17,12 @@ V1,10,08:00,17:00,DEPOT
 ORDERS = """order_id,latitude,longitude,size,order_created_time
 O1,-41.29,174.79,5,2026-07-22T12:00:00+12:00
 """
+STRUCTURED_ORDERS = (
+    "order_id,customer_name,suburban,address,city,latitude,longitude,size,"
+    "order_created_time\n"
+    "O1,Te Papa,Te Aro,55 Cable Street,Wellington,-41.2903326,174.7819275,5,"
+    "2026-07-22T12:00:00+12:00\n"
+)
 
 
 def test_valid_csv_bundle_loads() -> None:
@@ -31,6 +37,25 @@ def test_extra_columns_are_accepted_for_compatibility() -> None:
         )
     )
     assert orders[0].order_id == "O1"
+
+
+def test_structured_and_legacy_addresses_are_loaded() -> None:
+    structured = load_orders_csv(STRUCTURED_ORDERS)[0]
+    assert (
+        structured.customer_name,
+        structured.suburban,
+        structured.address,
+        structured.city,
+    ) == ("Te Papa", "Te Aro", "55 Cable Street", "Wellington")
+
+    legacy = load_orders_csv(
+        ORDERS.replace(
+            "order_created_time",
+            "order_created_time,address",
+        ).replace("+12:00", "+12:00,Te Aro")
+    )[0]
+    assert legacy.suburban == "Te Aro"
+    assert legacy.address == ""
 
 
 @pytest.mark.parametrize(

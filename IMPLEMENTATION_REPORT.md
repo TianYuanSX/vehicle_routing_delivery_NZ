@@ -36,7 +36,8 @@ Astral's GitHub releases into ignored `.tools/`, then used to install/manage Pyt
   flow-time pressure, configurable strategies, and time limit.
 - Shared route/ETA/result construction, objective metrics, operating costs,
   deferred-reason diagnosis, and solution invariant validation.
-- Synthetic Wellington example with a deliberate oversized order.
+- Synthetic Wellington demand at ten geocoded public locations, with address-source
+  and coordinate provenance documented beside the dataset.
 - Seeded arbitrary instance generation.
 - Streamlit built-in/upload/manual/generated inputs, solver/distance/objective
   settings, overview, auto-fit map, workloads, simulated statuses, fleet analysis,
@@ -83,12 +84,12 @@ global optimality.
 
 ## Verification results
 
-- Tests: 37 passed.
-- Coverage: 85% total with branch measurement.
+- Tests: 39 passed.
+- Coverage: 87% total with branch measurement.
 - Ruff check: passed.
 - Ruff format check: passed.
 - Mypy strict package check: passed with no issues across 32 source files.
-- Wellington offline solve: passed with both solvers; each planned 8 and deferred 2.
+- Wellington offline solve: passed with both solvers; each planned 9 and deferred 1.
 - Generated 50-order/10-vehicle greedy smoke: feasible, 46 planned, 4 deferred,
   0.005 seconds wall time.
 - Streamlit server smoke: started on localhost and shut down by the timeout.

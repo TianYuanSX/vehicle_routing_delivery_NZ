@@ -95,6 +95,10 @@ try:
                     "order_created_time": order.order_created_time.isoformat(),
                     "service_minutes": order.service_seconds // 60,
                     "priority": order.priority,
+                    "customer_name": order.customer_name,
+                    "suburban": order.suburban,
+                    "address": order.address,
+                    "city": order.city,
                 }
                 for order in sample_orders
             ]
@@ -112,8 +116,25 @@ try:
                 for vehicle in sample_vehicles
             ]
         )
-        edited_orders = st.data_editor(order_frame, num_rows="dynamic")
-        edited_vehicles = st.data_editor(vehicle_frame, num_rows="dynamic")
+        edited_orders = st.data_editor(
+            order_frame,
+            num_rows="dynamic",
+            key="manual_orders",
+            hide_index=True,
+            column_config={
+                "order_id": st.column_config.TextColumn("Order ID", pinned=True),
+                "customer_name": st.column_config.TextColumn("Customer"),
+                "suburban": st.column_config.TextColumn("Suburban"),
+                "address": st.column_config.TextColumn("Street address"),
+                "city": st.column_config.TextColumn("City"),
+            },
+        )
+        edited_vehicles = st.data_editor(
+            vehicle_frame,
+            num_rows="dynamic",
+            key="manual_vehicles",
+            hide_index=True,
+        )
         orders = orders_from_dataframe(edited_orders)
         vehicles = vehicles_from_dataframe(edited_vehicles, planning_date, depot.timezone)
         scenario = replace(scenario, planning_date=planning_date, dispatch_cutoff=cutoff)

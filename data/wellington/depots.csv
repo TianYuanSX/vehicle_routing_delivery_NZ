@@ -1,2 +1,2 @@
-depot_id,name,latitude,longitude,timezone
-WLG-DEPOT,Wellington Synthetic Depot,-41.2790,174.7800,Pacific/Auckland
+depot_id,name,address,suburban,city,latitude,longitude,timezone
+WLG-DEPOT,NZ Post Wellington Super Depot,8 Carmel Terrace,Grenada Village,Wellington,-41.2007115,174.8255637,Pacific/Auckland
