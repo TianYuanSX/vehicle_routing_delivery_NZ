@@ -14,6 +14,10 @@ from vrp_demo.dispatch.planner import build_instance, solve_dispatch
 from vrp_demo.dispatch.statuses import solution_statuses
 from vrp_demo.distance.haversine import HaversineDistanceProvider
 from vrp_demo.distance.osrm import DistanceProviderError, OSRMDistanceProvider
+from vrp_demo.distance.route_geometry import (
+    OSRMRouteGeometryProvider,
+    RouteGeometryError,
+)
 from vrp_demo.domain.models import ObjectiveConfig, ScenarioConfig, SolverConfig
 from vrp_demo.io.csv_loader import (
     InputValidationError,
@@ -34,6 +38,18 @@ from vrp_demo.simulation.instance_generator import generate_instance_data
 from vrp_demo.solvers.registry import SOLVERS, get_solver
 
 logger = logging.getLogger(__name__)
+
+
+@st.cache_data(ttl=3600, max_entries=128, show_spinner=False)
+def fetch_osrm_route_geometries(
+    route_waypoints: tuple[tuple[str, tuple[tuple[float, float], ...]], ...],
+) -> dict[str, tuple[tuple[float, float], ...]]:
+    provider = OSRMRouteGeometryProvider()
+    return {
+        vehicle_id: provider.route(waypoints).coordinates
+        for vehicle_id, waypoints in route_waypoints
+    }
+
 
 st.set_page_config(page_title="Vehicle Routing Demo", layout="wide")
 st.title("Vehicle Routing and Dispatch Prototype")
@@ -248,15 +264,43 @@ dispatch_tab, workload_tab, tracking_tab, fleet_tab, export_tab = st.tabs(
     ["Dispatch", "Vehicle workload", "Tracking", "Fleet analysis", "Exports"]
 )
 with dispatch_tab:
-    st.info(
-        "Route lines are approximate straight segments in Haversine mode."
-        if scenario.distance_provider == "haversine"
-        else (
-            "Distances use the OSRM road-network matrix; map lines remain straight "
-            "because the table API does not return route geometry."
-        )
+    route_line_style = st.segmented_control(
+        "Route line style",
+        ["Straight lines", "Follow roads"],
+        default="Straight lines",
+        key="route_line_style",
     )
-    st.pydeck_chart(dispatch_deck(instance, solution), width="stretch")
+    route_geometries = None
+    if route_line_style == "Follow roads":
+        direction_service = st.selectbox("Direction service", ["OSRM"], key="direction_service")
+        location_coordinates = {
+            instance.depot.depot_id: (instance.depot.latitude, instance.depot.longitude),
+            **{order.order_id: (order.latitude, order.longitude) for order in instance.orders},
+        }
+        route_waypoints = tuple(
+            (
+                route.vehicle_id,
+                tuple(location_coordinates[stop.location_id] for stop in route.stops),
+            )
+            for route in solution.routes
+        )
+        try:
+            with st.spinner(f"Fetching road geometry from {direction_service}..."):
+                route_geometries = fetch_osrm_route_geometries(route_waypoints)
+            st.caption(
+                "Road-following geometry is supplied by OSRM for visualization only. "
+                "Assignments, ETAs, and reported metrics are unchanged."
+            )
+        except RouteGeometryError as exc:
+            st.warning(
+                f"OSRM road geometry is unavailable ({exc}). Showing straight lines instead."
+            )
+    else:
+        st.caption("Straight lines are an offline approximation between the planned stops.")
+    st.pydeck_chart(
+        dispatch_deck(instance, solution, route_geometries),
+        width="stretch",
+    )
     st.dataframe(order_results_frame(solution), width="stretch")
 with workload_tab:
     st.dataframe(vehicle_results_frame(solution), width="stretch")

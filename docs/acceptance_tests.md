@@ -194,6 +194,17 @@ Prototype one is accepted only when all critical tests pass and no known defect 
 **When** the user exports results  
 **Then** order, vehicle, and route-leg CSV files match the displayed solution.
 
+### AT-UI-007 Route-line geometry
+
+**Given** a completed solve
+**When** the dispatch map uses its default line style
+**Then** routes render as offline straight segments without a direction API call.
+
+**And when** road-following lines are selected
+**Then** the selected optional direction provider is called for geometry only, the
+planned stop sequence is preserved, and an unavailable service visibly falls back
+to straight segments.
+
 ## 7. Fleet-size experiment tests
 
 ### AT-FLEET-001 Reproducibility

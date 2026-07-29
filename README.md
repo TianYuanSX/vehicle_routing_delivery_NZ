@@ -124,9 +124,22 @@ first, then by descending priority, and placed at the least-cost feasible positi
 
 Haversine mode uses direct geographic distance and converts it to time with a
 configurable average speed. It is suitable for tests and offline demonstrations.
-Its route lines are approximate. OSRM mode obtains road-network table distance and
-duration through HTTP with explicit timeout/error handling. The first prototype
-still draws straight map segments because the table API does not return geometry.
+OSRM distance mode obtains road-network table distance and duration through HTTP
+with explicit timeout/error handling.
+
+After solving, **Route line style** controls map geometry independently:
+
+- **Straight lines** is the default offline approximation and calls no direction
+  service.
+- **Follow roads** reveals the optional direction-service selector. The initial
+  implementation uses OSRM's Route service, caches the returned GeoJSON geometry
+  for one hour, and falls back visibly to straight lines if OSRM is unavailable.
+
+Road geometry is visualization-only. It preserves the solver's stop order and does
+not recalculate assignments, ETAs, reported distance, or objective values. The
+public OSRM demonstration endpoint has no production availability guarantee;
+production use should select and operate an appropriate hosted or self-hosted
+routing service.
 
 The weighted objective approximates the business hierarchy:
 
@@ -160,8 +173,10 @@ times, and ensures no order is delivered twice.
 
 ## Known limitations and future work
 
-OSRM route geometry is not fetched, OR-Tools uses a calibrated weighted objective
-rather than strict multi-pass lexicographic optimization, and multi-day simulation
-is exposed as an application API rather than its own Streamlit page. Production
-extensions include multiple depots/trips, time windows, multiple capacity
-dimensions, traffic, dynamic dispatch, route geometry, and persistent live events.
+Only OSRM is implemented for optional road geometry; GraphHopper, Valhalla, and
+Google Directions remain future `RouteGeometryProvider` adapters. OR-Tools uses a
+calibrated weighted objective rather than strict multi-pass lexicographic
+optimization, and multi-day simulation is exposed as an application API rather
+than its own Streamlit page. Production extensions include multiple depots/trips,
+time windows, multiple capacity dimensions, traffic, dynamic dispatch, and
+persistent live events.

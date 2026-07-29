@@ -6,6 +6,9 @@ These decisions apply to prototype one and should be reviewed before production 
 - Internal distance and duration units are integer metres and integer seconds.
 - The default Haversine road-speed approximation is 35 km/h; map lines in this mode
   are explicitly labelled approximate.
+- Dispatch maps default to offline straight segments. Road-following lines are an
+  explicit optional visualization request to OSRM, preserve planned stop order,
+  and do not change solver metrics or ETAs.
 - Order service defaults to five minutes when absent from input.
 - Priority is an integer from 1 (normal) to 5 (highest).
 - Dispatch occurs at the configured cutoff on the planning date in the depot's IANA

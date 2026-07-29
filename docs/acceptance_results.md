@@ -14,6 +14,7 @@ Haversine matrices, and mocked OSRM HTTP behavior.
 | AT-UI-003 | Pass | `map_view` is tested with non-Wellington coordinates and derives center/zoom from all coordinates; Streamlit tests verify marker counts update after generator changes and CSV uploads. |
 | AT-UI-004 and AT-UI-005 | Pass | App renders full order and every-vehicle result frames from the common solution; used and unused vehicle metrics are generated together. |
 | AT-UI-006 | Pass | Export tests reconcile order, vehicle, and route-leg frames with the solution; the UI exposes all three CSV downloads plus JSON/YAML. |
+| AT-UI-007 | Pass | Straight lines are the offline default and hide direction controls; AppTest selects Follow roads with mocked OSRM success and `NoRoute` responses, confirming optional controls, returned geometry, and visible straight-line fallback. |
 | AT-FLEET-001 through AT-FLEET-004 | Pass | Seeded repeat test compares tidy runs; implementation changes only the vehicle prefix and makes no monotonicity claim. |
 | AT-COMP-001 through AT-COMP-003 | Pass | Registry solvers consume the identical `RoutingInstance` and return `RoutingSolution`; feasibility is validated before presentation. |
 | Performance targets | Pass for prototype smoke scope | A generated 50-order/10-vehicle offline instance and the Wellington scenarios were executed during final verification; configured OR-Tools time limits are passed directly to the search. |

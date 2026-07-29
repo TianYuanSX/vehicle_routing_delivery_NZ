@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping, Sequence
 
 import pydeck as pdk
 
+from vrp_demo.distance.base import Coordinate
 from vrp_demo.domain.enums import PlanningStatus
 from vrp_demo.domain.models import Depot, Order, RoutingInstance, RoutingSolution
 
@@ -87,7 +89,11 @@ def scenario_deck(depot: Depot, orders: tuple[Order, ...]) -> pdk.Deck:
     )
 
 
-def dispatch_deck(instance: RoutingInstance, solution: RoutingSolution) -> pdk.Deck:
+def dispatch_deck(
+    instance: RoutingInstance,
+    solution: RoutingSolution,
+    route_geometries: Mapping[str, Sequence[Coordinate]] | None = None,
+) -> pdk.Deck:
     coordinates = {
         instance.depot.depot_id: [instance.depot.longitude, instance.depot.latitude],
         **{order.order_id: [order.longitude, order.latitude] for order in instance.orders},
@@ -131,10 +137,16 @@ def dispatch_deck(instance: RoutingInstance, solution: RoutingSolution) -> pdk.D
         )
     paths = []
     for route_index, route in enumerate(solution.routes):
+        road_geometry = (route_geometries or {}).get(route.vehicle_id)
+        path = (
+            [[longitude, latitude] for latitude, longitude in road_geometry]
+            if road_geometry
+            else [coordinates[stop.location_id] for stop in route.stops]
+        )
         paths.append(
             {
                 "vehicle_id": route.vehicle_id,
-                "path": [coordinates[stop.location_id] for stop in route.stops],
+                "path": path,
                 "color": COLORS[route_index % len(COLORS)],
             }
         )

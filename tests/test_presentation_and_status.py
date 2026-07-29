@@ -12,7 +12,7 @@ from vrp_demo.presentation.exports import (
     vehicle_results_frame,
 )
 from vrp_demo.presentation.manual_input import depot_to_manual_frame, orders_to_manual_frame
-from vrp_demo.presentation.map_layers import map_view, scenario_deck
+from vrp_demo.presentation.map_layers import dispatch_deck, map_view, scenario_deck
 from vrp_demo.solvers.greedy_insertion import GreedyInsertionSolver
 
 
@@ -32,6 +32,19 @@ def test_scenario_map_contains_depot_and_orders(depot) -> None:
     assert '"location_id": "O2"' in payload
     assert payload.count('"status": "ORDER"') == 2
     assert '"status": "DEPOT"' in payload
+
+
+def test_dispatch_map_accepts_road_geometry(depot, scenario) -> None:
+    instance = make_instance([make_order("O1")], [make_vehicle()], depot, scenario)
+    solution = GreedyInsertionSolver().solve(instance, SolverConfig())
+    payload = dispatch_deck(
+        instance,
+        solution,
+        {"V1": ((-41.28, 174.78), (-41.285, 174.795), (-41.29, 174.79))},
+    ).to_json()
+
+    assert "174.795" in payload
+    assert "-41.285" in payload
 
 
 def test_manual_input_accepts_order_from_before_structured_addresses(timezone) -> None:

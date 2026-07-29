@@ -181,6 +181,8 @@ The application must show:
 - Order locations.
 - A scenario preview that refreshes when valid input data changes.
 - One path per vehicle.
+- A dispatch-map choice between offline straight segments and optional
+  road-following direction-service geometry.
 - Stop order.
 - Order status.
 - ETA and order size on hover or selection.

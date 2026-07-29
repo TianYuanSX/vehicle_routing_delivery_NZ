@@ -27,8 +27,9 @@ Astral's GitHub releases into ignored `.tools/`, then used to install/manage Pyt
   capacity, shift, matrix, ID, cost, priority, and objective validation.
 - Whole-file CSV/YAML loading with aggregated row errors, dataframe adapters,
   cross-reference checks, and no silent row loss.
-- Deterministic Haversine distance/time matrices, injectable OSRM table HTTP client,
-  readable content-addressed JSON cache, and UI Haversine fallback.
+- Deterministic Haversine distance/time matrices, injectable OSRM table and Route
+  HTTP clients, readable content-addressed matrix cache, cached road geometry,
+  and UI Haversine/straight-line fallbacks.
 - Common `RoutingSolver` protocol and registry.
 - Deterministic greedy oldest/highest-priority cheapest feasible insertion.
 - OR-Tools routing adapter with capacity and time dimensions, per-vehicle capacity
@@ -40,8 +41,8 @@ Astral's GitHub releases into ignored `.tools/`, then used to install/manage Pyt
   and coordinate provenance documented beside the dataset.
 - Seeded arbitrary instance generation.
 - Streamlit built-in/upload/manual/generated inputs, solver/distance/objective
-  settings, overview, auto-fit map, workloads, simulated statuses, fleet analysis,
-  charts, and CSV/JSON/YAML exports.
+  settings, overview, auto-fit map, optional straight/OSRM road route lines,
+  workloads, simulated statuses, fleet analysis, charts, and CSV/JSON/YAML exports.
 - Reproducible fleet-size and day-by-day backlog simulation.
 - GitHub Actions checks for lock, sync, tests, Ruff, formatting, and Mypy.
 
@@ -84,20 +85,23 @@ global optimality.
 
 ## Verification results
 
-- Tests: 44 passed, including reactive-map coverage across all four input modes,
-  manual-table compatibility, editable depot conversion, and the validated
-  three-table input bundle.
+- Tests: 49 passed, including optional direction-service UI behavior, mocked OSRM
+  GeoJSON/error handling, route-geometry rendering, reactive maps across all four
+  input modes, and manual-table validation.
 - Coverage: 90% total with branch measurement.
 - Ruff check: passed.
 - Ruff format check: passed.
-- Mypy strict package check: passed with no issues across 33 source files.
+- Mypy strict package check: passed with no issues across 34 source files.
 - Wellington offline solve: passed with both solvers; each planned 9 and deferred 1.
 - Generated 50-order/10-vehicle greedy smoke: feasible, 46 planned, 4 deferred,
   0.005 seconds wall time.
 - Streamlit server smoke: started on localhost and shut down by the timeout.
 - Streamlit AppTest: all four input modes, all three Manual tables, reactive
-  generated/uploaded map data, stale-result invalidation, and the default
-  Wellington solve completed with zero exceptions.
+  generated/uploaded map data, stale-result invalidation, optional road-geometry
+  controls with mocked success/fallback responses, and the default Wellington solve
+  completed with zero exceptions.
+- Explicit OSRM Route smoke: passed using two synthetic public Wellington points;
+  returned a 181-point road-following GeoJSON line.
 - Lock check and locked sync: passed.
 - OR-Tools import: passed.
 - Acceptance mapping: [docs/acceptance_results.md](docs/acceptance_results.md).
@@ -111,15 +115,18 @@ shift start/cutoff, and the documented default objective weights.
 ## Conflicts and resolutions
 
 No meaningful conflict was found. Existing documents allow Python 3.12 or newer;
-the explicit task pins 3.12. The requested OSRM preference for route geometry cannot
-be satisfied by the table endpoint alone, so OSRM road matrices are used while the
-map transparently labels straight visualization segments.
+the explicit task pins 3.12. OSRM table and Route services remain separate:
+matrices drive optimization, while the optional Route call supplies visualization
+geometry without changing the planned stop order or metrics.
 
 ## Known limitations
 
 - OR-Tools uses a weighted single-pass approximation rather than formal
   lexicographic sequential optimization.
-- OSRM table results do not provide route geometry; map segments remain straight.
+- OSRM is the only implemented road-geometry adapter. GraphHopper, Valhalla, and
+  Google Directions require future provider implementations and hosting/key policy.
+- The public OSRM demonstration service has no application availability guarantee;
+  failures visibly fall back to straight route segments.
 - The multi-day simulator is a tested application API, not a dedicated Streamlit
   page in this first vertical slice.
 - No live traffic/GPS, time windows, breaks, reloading, multiple trips/depots,
@@ -137,6 +144,7 @@ tool binary is included in tracked project files.
 
 Review objective calibration against realistic maximum route scales, confirm the
 capacity unit and service policy, select an OSRM hosting/privacy policy, and inspect
-the visual design in a browser. Next technical steps are OSRM route geometry,
-strict multi-pass lexicographic solving, a multi-day UI, persisted plans/events,
-and production authentication/deployment controls.
+the visual design in a browser. Next technical steps are additional
+`RouteGeometryProvider` adapters, strict multi-pass lexicographic solving, a
+multi-day UI, persisted plans/events, and production authentication/deployment
+controls.
