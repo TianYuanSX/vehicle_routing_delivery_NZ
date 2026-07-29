@@ -1,8 +1,17 @@
 from pathlib import Path
 
+import pytest
+import streamlit as st
 from streamlit.testing.v1 import AppTest
 
 from vrp_demo.presentation import map_layers
+
+
+@pytest.fixture(autouse=True)
+def clear_streamlit_data_cache():
+    st.cache_data.clear()
+    yield
+    st.cache_data.clear()
 
 
 def _chart_json(app: AppTest) -> str:
@@ -55,9 +64,10 @@ class FakeNoRouteResponse(FakeDirectionResponse):
 
 
 def test_default_dispatch_map_preserves_two_argument_call(monkeypatch) -> None:
-    """A hot-reloaded app can temporarily retain the previous map module."""
+    """Both line styles work when hot reload retains the previous map module."""
     original_dispatch_deck = map_layers.dispatch_deck
     call_count = 0
+    direction_client = FakeDirectionClient()
 
     def previous_dispatch_deck(instance, solution):
         nonlocal call_count
@@ -65,6 +75,10 @@ def test_default_dispatch_map_preserves_two_argument_call(monkeypatch) -> None:
         return original_dispatch_deck(instance, solution)
 
     monkeypatch.setattr(map_layers, "dispatch_deck", previous_dispatch_deck)
+    monkeypatch.setattr(
+        "vrp_demo.distance.route_geometry.httpx.Client",
+        lambda: direction_client,
+    )
 
     app = AppTest.from_file("app.py", default_timeout=20).run()
     _selectbox(app, "Solver").select("greedy_insertion")
@@ -73,6 +87,13 @@ def test_default_dispatch_map_preserves_two_argument_call(monkeypatch) -> None:
     assert not app.exception
     assert call_count == 1
     assert len(app.metric) == 6
+
+    app.segmented_control[0].set_value("Follow roads").run()
+
+    assert not app.exception
+    assert call_count == 2
+    assert direction_client.calls > 0
+    assert "174.781234" in app.get("deck_gl_json_chart")[-1].proto.json
 
 
 def test_scenario_map_reacts_across_input_modes(monkeypatch) -> None:

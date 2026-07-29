@@ -88,7 +88,8 @@ global optimality.
 - Tests: 50 passed, including optional direction-service UI behavior, mocked OSRM
   GeoJSON/error handling, route-geometry rendering, reactive maps across all four
   input modes, manual-table validation, and compatibility with a hot-reloaded map
-  module that still exposes the previous two-argument `dispatch_deck` API.
+  module that still exposes the previous two-argument `dispatch_deck` API in both
+  straight-line and road-following modes.
 - Coverage: 90% total with branch measurement.
 - Ruff check: passed.
 - Ruff format check: passed.

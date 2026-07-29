@@ -1,17 +1,20 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, replace
 from datetime import date, time
 from zoneinfo import ZoneInfo
 
 import pandas as pd
 import plotly.express as px
+import pydeck as pdk
 import streamlit as st
 import yaml
 
 from vrp_demo.dispatch.planner import build_instance, solve_dispatch
 from vrp_demo.dispatch.statuses import solution_statuses
+from vrp_demo.distance.base import Coordinate
 from vrp_demo.distance.haversine import HaversineDistanceProvider
 from vrp_demo.distance.osrm import DistanceProviderError, OSRMDistanceProvider
 from vrp_demo.distance.route_geometry import (
@@ -49,6 +52,25 @@ def fetch_osrm_route_geometries(
         vehicle_id: provider.route(waypoints).coordinates
         for vehicle_id, waypoints in route_waypoints
     }
+
+
+def apply_route_geometries(
+    deck: pdk.Deck,
+    route_geometries: Mapping[str, Sequence[Coordinate]] | None,
+) -> pdk.Deck:
+    """Replace straight route paths without depending on a newer map function API."""
+    if not route_geometries:
+        return deck
+    for layer in deck.layers:
+        if layer.type != "PathLayer":
+            continue
+        for route_path in layer.data:
+            road_geometry = route_geometries.get(route_path["vehicle_id"])
+            if road_geometry:
+                route_path["path"] = [
+                    [longitude, latitude] for latitude, longitude in road_geometry
+                ]
+    return deck
 
 
 st.set_page_config(page_title="Vehicle Routing Demo", layout="wide")
@@ -297,14 +319,9 @@ with dispatch_tab:
             )
     else:
         st.caption("Straight lines are an offline approximation between the planned stops.")
-    dispatch_map = (
-        dispatch_deck(instance, solution)
-        if route_geometries is None
-        else dispatch_deck(
-            instance,
-            solution,
-            route_geometries=route_geometries,
-        )
+    dispatch_map = apply_route_geometries(
+        dispatch_deck(instance, solution),
+        route_geometries,
     )
     st.pydeck_chart(dispatch_map, width="stretch")
     st.dataframe(order_results_frame(solution), width="stretch")
