@@ -12,7 +12,7 @@ from vrp_demo.presentation.exports import (
     vehicle_results_frame,
 )
 from vrp_demo.presentation.manual_input import depot_to_manual_frame, orders_to_manual_frame
-from vrp_demo.presentation.map_layers import map_view
+from vrp_demo.presentation.map_layers import map_view, scenario_deck
 from vrp_demo.solvers.greedy_insertion import GreedyInsertionSolver
 
 
@@ -21,6 +21,17 @@ def test_map_view_uses_arbitrary_coordinates() -> None:
     assert latitude == 51.55
     assert longitude == 0
     assert 1 <= zoom <= 15
+
+
+def test_scenario_map_contains_depot_and_orders(depot) -> None:
+    deck = scenario_deck(depot, (make_order("O1"), make_order("O2")))
+    payload = deck.to_json()
+
+    assert '"location_id": "DEPOT"' in payload
+    assert '"location_id": "O1"' in payload
+    assert '"location_id": "O2"' in payload
+    assert payload.count('"status": "ORDER"') == 2
+    assert '"status": "DEPOT"' in payload
 
 
 def test_manual_input_accepts_order_from_before_structured_addresses(timezone) -> None:

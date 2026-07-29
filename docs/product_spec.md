@@ -179,6 +179,7 @@ The application must show:
 
 - Depot location.
 - Order locations.
+- A scenario preview that refreshes when valid input data changes.
 - One path per vehicle.
 - Stop order.
 - Order status.

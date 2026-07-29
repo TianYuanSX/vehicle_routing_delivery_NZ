@@ -28,7 +28,7 @@ from vrp_demo.presentation.exports import (
     vehicle_results_frame,
 )
 from vrp_demo.presentation.manual_input import depot_to_manual_frame, orders_to_manual_frame
-from vrp_demo.presentation.map_layers import dispatch_deck
+from vrp_demo.presentation.map_layers import dispatch_deck, scenario_deck
 from vrp_demo.simulation.fleet_size import run_fleet_size_analysis
 from vrp_demo.simulation.instance_generator import generate_instance_data
 from vrp_demo.solvers.registry import SOLVERS, get_solver
@@ -167,6 +167,21 @@ scenario = replace(
         int(priority_weight),
     ),
 )
+input_signature = repr((orders, vehicles, depot, scenario))
+if st.session_state.get("_input_signature") != input_signature:
+    st.session_state["_input_signature"] = input_signature
+    st.session_state.pop("instance", None)
+    st.session_state.pop("solution", None)
+    st.session_state.pop("scenario", None)
+
+with st.container(border=True):
+    st.subheader("Scenario map")
+    st.caption(
+        "Input preview — depot and order markers update automatically when valid "
+        "uploads, manual tables, or generation settings change."
+    )
+    st.pydeck_chart(scenario_deck(depot, orders), width="stretch", height=500)
+
 solver_config = SolverConfig(
     time_limit,
     scenario.random_seed,

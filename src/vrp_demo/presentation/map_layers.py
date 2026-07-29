@@ -5,7 +5,7 @@ import math
 import pydeck as pdk
 
 from vrp_demo.domain.enums import PlanningStatus
-from vrp_demo.domain.models import RoutingInstance, RoutingSolution
+from vrp_demo.domain.models import Depot, Order, RoutingInstance, RoutingSolution
 
 COLORS = [
     [31, 119, 180],
@@ -27,6 +27,64 @@ def map_view(coordinates: list[tuple[float, float]]) -> tuple[float, float, floa
     span = max(max(latitudes) - min(latitudes), max(longitudes) - min(longitudes), 0.001)
     zoom = max(1.0, min(15.0, math.log2(180 / span) - 1.0))
     return center_latitude, center_longitude, zoom
+
+
+def scenario_deck(depot: Depot, orders: tuple[Order, ...]) -> pdk.Deck:
+    """Build a reactive input preview without requiring a solved route."""
+    points = [
+        {
+            "location_id": depot.depot_id,
+            "position": [depot.longitude, depot.latitude],
+            "status": "DEPOT",
+            "color": [20, 20, 20],
+            "radius": 180,
+            "customer_name": depot.name,
+            "address": getattr(depot, "address", ""),
+            "suburban": getattr(depot, "suburban", ""),
+            "city": getattr(depot, "city", ""),
+            "details": "Depot",
+        },
+        *[
+            {
+                "location_id": order.order_id,
+                "position": [order.longitude, order.latitude],
+                "status": "ORDER",
+                "color": [31, 119, 180],
+                "radius": 120,
+                "customer_name": getattr(order, "customer_name", "") or order.order_id,
+                "address": getattr(order, "address", ""),
+                "suburban": getattr(order, "suburban", ""),
+                "city": getattr(order, "city", ""),
+                "details": f"Order size: {order.size}",
+            }
+            for order in orders
+        ],
+    ]
+    latitude, longitude, zoom = map_view(
+        [(depot.latitude, depot.longitude)]
+        + [(order.latitude, order.longitude) for order in orders]
+    )
+    return pdk.Deck(
+        layers=[
+            pdk.Layer(
+                "ScatterplotLayer",
+                points,
+                get_position="position",
+                get_fill_color="color",
+                get_radius="radius",
+                pickable=True,
+            )
+        ],
+        initial_view_state=pdk.ViewState(
+            latitude=latitude, longitude=longitude, zoom=zoom, pitch=0
+        ),
+        tooltip={
+            "html": (
+                "<b>{customer_name}</b><br>{location_id} · {status}<br>"
+                "{address}<br>{suburban}, {city}<br>{details}"
+            )
+        },
+    )
 
 
 def dispatch_deck(instance: RoutingInstance, solution: RoutingSolution) -> pdk.Deck:

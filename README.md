@@ -17,8 +17,9 @@ fleet sizes. The included Wellington dataset is synthetic and works fully offlin
   exports, simulations, and UI.
 - Built-in Wellington data at geocoded public locations, CSV upload, editable
   manual tables, and seeded instance generation.
-- Streamlit dispatch map with data-derived center/zoom, simulated order tracking,
-  vehicle workloads, exports, and reproducible fleet-size analysis.
+- Reactive Streamlit scenario preview and dispatch map with data-derived center/zoom,
+  simulated order tracking, vehicle workloads, exports, and reproducible fleet-size
+  analysis.
 - Day-by-day backlog simulation that preserves creation timestamps.
 
 ## Prototype assumptions

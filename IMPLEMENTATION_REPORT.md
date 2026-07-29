@@ -84,9 +84,10 @@ global optimality.
 
 ## Verification results
 
-- Tests: 42 passed, including regression tests for manual-table compatibility,
-  editable depot conversion, and the validated three-table input bundle.
-- Coverage: 87% total with branch measurement.
+- Tests: 44 passed, including reactive-map coverage across all four input modes,
+  manual-table compatibility, editable depot conversion, and the validated
+  three-table input bundle.
+- Coverage: 90% total with branch measurement.
 - Ruff check: passed.
 - Ruff format check: passed.
 - Mypy strict package check: passed with no issues across 33 source files.
@@ -94,9 +95,9 @@ global optimality.
 - Generated 50-order/10-vehicle greedy smoke: feasible, 46 planned, 4 deferred,
   0.005 seconds wall time.
 - Streamlit server smoke: started on localhost and shut down by the timeout.
-- Streamlit AppTest: default page, all three Manual tables, and the default
-  Wellington solve completed with zero exceptions; the solve rendered all six
-  headline metrics.
+- Streamlit AppTest: all four input modes, all three Manual tables, reactive
+  generated/uploaded map data, stale-result invalidation, and the default
+  Wellington solve completed with zero exceptions.
 - Lock check and locked sync: passed.
 - OR-Tools import: passed.
 - Acceptance mapping: [docs/acceptance_results.md](docs/acceptance_results.md).
