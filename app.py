@@ -28,6 +28,7 @@ from vrp_demo.presentation.exports import (
     solution_json,
     vehicle_results_frame,
 )
+from vrp_demo.presentation.manual_input import orders_to_manual_frame
 from vrp_demo.presentation.map_layers import dispatch_deck
 from vrp_demo.simulation.fleet_size import run_fleet_size_analysis
 from vrp_demo.simulation.instance_generator import generate_instance_data
@@ -85,24 +86,7 @@ try:
         )
     else:
         sample_orders, sample_vehicles, depot, scenario = load_wellington_example()
-        order_frame = pd.DataFrame(
-            [
-                {
-                    "order_id": order.order_id,
-                    "latitude": order.latitude,
-                    "longitude": order.longitude,
-                    "size": order.size,
-                    "order_created_time": order.order_created_time.isoformat(),
-                    "service_minutes": order.service_seconds // 60,
-                    "priority": order.priority,
-                    "customer_name": order.customer_name,
-                    "suburban": order.suburban,
-                    "address": order.address,
-                    "city": order.city,
-                }
-                for order in sample_orders
-            ]
-        )
+        order_frame = orders_to_manual_frame(sample_orders)
         vehicle_frame = pd.DataFrame(
             [
                 {

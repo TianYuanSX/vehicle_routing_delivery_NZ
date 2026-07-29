@@ -84,17 +84,18 @@ global optimality.
 
 ## Verification results
 
-- Tests: 39 passed.
+- Tests: 40 passed, including a regression test for manual-table compatibility
+  with pre-address-migration `Order` instances retained during Streamlit hot reload.
 - Coverage: 87% total with branch measurement.
 - Ruff check: passed.
 - Ruff format check: passed.
-- Mypy strict package check: passed with no issues across 32 source files.
+- Mypy strict package check: passed with no issues across 33 source files.
 - Wellington offline solve: passed with both solvers; each planned 9 and deferred 1.
 - Generated 50-order/10-vehicle greedy smoke: feasible, 46 planned, 4 deferred,
   0.005 seconds wall time.
 - Streamlit server smoke: started on localhost and shut down by the timeout.
-- Streamlit AppTest: default page and default Wellington solve completed with zero
-  exceptions and rendered all six headline metrics.
+- Streamlit AppTest: default page, Manual tables mode, and the default Wellington
+  solve completed with zero exceptions; the solve rendered all six headline metrics.
 - Lock check and locked sync: passed.
 - OR-Tools import: passed.
 - Acceptance mapping: [docs/acceptance_results.md](docs/acceptance_results.md).

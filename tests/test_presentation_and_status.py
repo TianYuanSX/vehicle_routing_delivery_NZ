@@ -1,4 +1,5 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
+from types import SimpleNamespace
 
 from tests.conftest import make_instance, make_order, make_vehicle
 from vrp_demo.dispatch.statuses import solution_statuses
@@ -10,6 +11,7 @@ from vrp_demo.presentation.exports import (
     solution_json,
     vehicle_results_frame,
 )
+from vrp_demo.presentation.manual_input import orders_to_manual_frame
 from vrp_demo.presentation.map_layers import map_view
 from vrp_demo.solvers.greedy_insertion import GreedyInsertionSolver
 
@@ -19,6 +21,26 @@ def test_map_view_uses_arbitrary_coordinates() -> None:
     assert latitude == 51.55
     assert longitude == 0
     assert 1 <= zoom <= 15
+
+
+def test_manual_input_accepts_order_from_before_structured_addresses(timezone) -> None:
+    legacy_order = SimpleNamespace(
+        order_id="LEGACY-1",
+        latitude=-41.29,
+        longitude=174.78,
+        size=4,
+        order_created_time=datetime(2026, 7, 22, 12, tzinfo=timezone),
+        service_seconds=300,
+        priority=1,
+        customer_name="Legacy customer",
+        address="Te Aro",
+    )
+
+    row = orders_to_manual_frame([legacy_order]).iloc[0]
+
+    assert row["suburban"] == "Te Aro"
+    assert row["address"] == ""
+    assert row["city"] == ""
 
 
 def test_exports_reconcile_and_statuses_advance(depot, scenario) -> None:
